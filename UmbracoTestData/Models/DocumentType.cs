@@ -1,5 +1,4 @@
 using System;
-using Humanizer;
 
 namespace UmbracoTestData.Models
 {
@@ -7,10 +6,10 @@ namespace UmbracoTestData.Models
     {
         public DocumentType(Guid key, string name)
         {
-            var templateName = name.Camelize();
+            var templateName = name.ToCamelCase();
             Key = key;
             Name = name;
-            Alias = name.Camelize();
+            Alias = name.ToCamelCase();
             AllowedTemplates = new[] { templateName };
             DefaultTemplate = templateName;
         }
@@ -18,9 +17,9 @@ namespace UmbracoTestData.Models
         public Guid[] CompositeContentTypes { get; set; } = Array.Empty<Guid>();
         public bool IsContainer { get; set; }
         public bool AllowAsRoot { get; set; }
-        public string[] AllowedTemplates { get; set; } = Array.Empty<string>();
+        public string[] AllowedTemplates { get; set; }
         public int[] AllowedContentTypes { get; set; } = Array.Empty<int>();
-        public string Alias { get; set; } = string.Empty;
+        public string Alias { get; set; }
         public string Description { get; set; }
         public string Thumbnail { get; set; } = "folder.png";
         public string Name { get; set; }

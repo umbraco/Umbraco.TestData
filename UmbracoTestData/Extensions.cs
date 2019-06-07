@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace UmbracoTestData
 {
-    public static class Extensions
+    internal static class Extensions
     {
         /// <summary>
         /// Break a list of items into chunks of a specific size
@@ -15,6 +17,14 @@ namespace UmbracoTestData
                 yield return source.Take((int)chunkSize);
                 source = source.Skip((int)chunkSize);
             }
+        }
+        
+        public static string ToCamelCase(this string str)
+        {
+            TextInfo cultInfo = new CultureInfo("en-US", false).TextInfo;
+            str = cultInfo.ToTitleCase(str);
+            str = str.Replace(" ", "");
+            return str.Substring(0, 1).ToLower() + str.Substring(1);
         }
     }
 }
