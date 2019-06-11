@@ -107,19 +107,19 @@ namespace UmbracoTestData
                 _maxItemsPrLevel);
 
             var container = await CreateSingleContent("TestData Container");
-            await CreateManyContent(_countOfContentNodes, _maxItemsPrLevel,  container.Id);
+            await CreateManyContent(_countOfContentNodes, _maxItemsPrLevel,  container.Id, numberOfLevels);
 
             //TODO handle non happy path
         }
 
-        private async Task CreateManyContent(uint countOfContentNodes, uint numberOfItemsOnEachLevel, int parentId)
+        private async Task CreateManyContent(uint countOfContentNodes, uint numberOfItemsOnEachLevel, int parentId, uint numberOfLevels)
         {
             var parentIds = new Dictionary<string, int>();
             //Build one level at a time in parallel 
             var levels = BuildLevels(countOfContentNodes, numberOfItemsOnEachLevel);
 
 
-            for (var i = 1; i < 10; i++) // If more then 10 levels, then just quit - That's too insane.
+            for (var i = 1; i <= numberOfLevels; i++) 
             {
                 var current = levels.Where(x => x.Value.Count == i).ToArray();
 
