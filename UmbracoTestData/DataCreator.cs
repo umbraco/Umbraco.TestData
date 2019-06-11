@@ -41,6 +41,7 @@ namespace UmbracoTestData
             _maxItemsPrLevel = maxItemsPrLevel;
             _chunkSize = chunkSize;
             _httpClient = new HttpClient();
+            _httpClient.Timeout = TimeSpan.FromSeconds(5);
         }
 
         public async Task Start()
@@ -106,15 +107,14 @@ namespace UmbracoTestData
                 _maxItemsPrLevel);
 
             var container = await CreateSingleContent("TestData Container");
-            await CreateManyContent(_countOfContentNodes, _maxItemsPrLevel,  container.Id,
-                new int[_countOfContentNodes]);
+            await CreateManyContent(_countOfContentNodes, _maxItemsPrLevel,  container.Id);
 
             //TODO handle non happy path
         }
 
-        private async Task CreateManyContent(uint countOfContentNodes,
-            uint numberOfItemsOnEachLevel, int parentId, IList<int> parentIds)
+        private async Task CreateManyContent(uint countOfContentNodes, uint numberOfItemsOnEachLevel, int parentId)
         {
+            var parentIds = new Dictionary<string, int>();
             //Build one level at a time in parallel 
             var levels = BuildLevels(countOfContentNodes, numberOfItemsOnEachLevel);
 
@@ -139,10 +139,12 @@ namespace UmbracoTestData
                     var tasks = new Dictionary<int, Task<Content>>();
                     foreach (var (key, _) in chunk)
                     {
-                        var name = GetNameBasedOnPositionInTree((uint) key, numberOfItemsOnEachLevel);
-                        var parentIndex = GetParentIndex((uint) key, numberOfItemsOnEachLevel);
+                        var position = GetPositionInTree((uint) key, numberOfItemsOnEachLevel);
+                        var name = $"Item {string.Join(".", position)}";
+                        var parentPosition = GetParentPositionAsString((uint) key, numberOfItemsOnEachLevel);
 
-                        var newParentId = parentIndex == null ? null : (int?) parentIds[parentIndex.Value];
+                        
+                        var newParentId = string.IsNullOrEmpty(parentPosition) ? null : (int?) parentIds[parentPosition];
                         var task = CreateSingleContent(name, newParentId ?? parentId);
 
                         tasks.Add(key, task);
@@ -152,7 +154,8 @@ namespace UmbracoTestData
 
                     foreach (var (key, value) in tasks)
                     {
-                        parentIds[key] = value.Result.Id;
+                        var position = GetPositionInTree((uint) key, numberOfItemsOnEachLevel);
+                        parentIds[String.Join(".", position)] = value.Result.Id;
                     }
 
                     _logger.Information("Created {createdNumber}/{numberInLevel}",
@@ -161,40 +164,50 @@ namespace UmbracoTestData
             }
         }
 
-        private static IDictionary<int, IList<int>> BuildLevels(uint countOfContentNodes, uint numberOfItemsOnEachLevel)
+        private static IDictionary<int, IList<uint>> BuildLevels(uint countOfContentNodes, uint numberOfItemsOnEachLevel)
         {
-            var result = new Dictionary<int, IList<int>>();
+            var result = new Dictionary<int, IList<uint>>();
 
-            for (var i = 0; i < countOfContentNodes; i++)
+            for (var i = 1; i <= countOfContentNodes; i++)
             {
-                var name = GetNameBasedOnPositionInTree((uint) i, numberOfItemsOnEachLevel);
-                result[i] = name.Split(new[] { ".", "Item" }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)
-                    .ToList();
+                result[i] = GetPositionInTree((uint) i, numberOfItemsOnEachLevel);
             }
 
             return result;
         }
 
-        private static int? GetParentIndex(uint currentItemNumber, uint numberOfItemsOnEachLevel)
+        private static string GetParentPositionAsString(uint currentItemNumber, uint numberOfItemsOnEachLevel)
         {
-            var number = (int) (currentItemNumber / numberOfItemsOnEachLevel);
+            var position = GetPositionInTree( currentItemNumber, numberOfItemsOnEachLevel);
 
-            return number > 0 ? (int?) number : null;
+            return string.Join(".", position.Take(position.Count - 1));
         }
 
-        private static string GetNameBasedOnPositionInTree(uint currentItemNumber, uint numberOfItemsOnEachLevel)
+        internal static IList<uint> GetPositionInTree(uint currentItemNumber, uint numberOfItemsOnEachLevel)
         {
-            var position = string.Empty;
             var runner = currentItemNumber;
-            do
-            {
-                var num = runner % numberOfItemsOnEachLevel;
-                runner /= numberOfItemsOnEachLevel;
-                position = num + "." + position;
-            } while (runner > 0);
 
-            return $"Item {position.Substring(0, position.Length - 1)}";
+            if (currentItemNumber == 0)
+            {
+                return new List<uint>(){ 0 };
+            }
+            
+            var remainders = new List<uint>();
+            while (runner != 0)
+            {
+                var remainder = (runner % numberOfItemsOnEachLevel);
+
+                if (remainder == 0)
+                {
+                    remainder+= numberOfItemsOnEachLevel;
+                    runner -= numberOfItemsOnEachLevel;
+                }
+                remainders.Insert(0, remainder);
+                runner /= numberOfItemsOnEachLevel;
+            }
+            return remainders;
         }
+        
 
         private async Task<Content> CreateSingleContent(string name, int parentId = -1)
         {

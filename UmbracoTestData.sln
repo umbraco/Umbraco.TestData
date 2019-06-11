@@ -7,6 +7,8 @@ ProjectSection(SolutionItems) = preProject
 	Readme.md = Readme.md
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoTestData.UnitTests", "UmbracoTestData.UnitTests\UmbracoTestData.UnitTests.csproj", "{C606BF6E-D37D-4624-A280-DD464B26B6B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,5 +19,9 @@ Global
 		{B6733F1D-1640-4C45-BE36-D50F22799F3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6733F1D-1640-4C45-BE36-D50F22799F3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6733F1D-1640-4C45-BE36-D50F22799F3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C606BF6E-D37D-4624-A280-DD464B26B6B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C606BF6E-D37D-4624-A280-DD464B26B6B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C606BF6E-D37D-4624-A280-DD464B26B6B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C606BF6E-D37D-4624-A280-DD464B26B6B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
