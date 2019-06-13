@@ -1,4 +1,6 @@
 using System;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace UmbracoTestData.Models
 {

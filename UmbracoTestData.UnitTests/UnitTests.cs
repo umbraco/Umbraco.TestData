@@ -1,7 +1,6 @@
 using NUnit.Framework;
-using UmbracoTestData;
 
-namespace Tests
+namespace UmbracoTestData.UnitTests
 {
     public class Tests
     {
@@ -17,7 +16,6 @@ namespace Tests
         [TestCase(8, 5, ExpectedResult = "1.3")]
         [TestCase(9, 5, ExpectedResult = "1.4")]
         [TestCase(10, 5, ExpectedResult = "1.5")]
-        [TestCase(0, 10, ExpectedResult = "0")]
         [TestCase(1, 10, ExpectedResult = "1")]
         [TestCase(2, 10, ExpectedResult = "2")]
         [TestCase(3, 10, ExpectedResult = "3")]

@@ -1,7 +1,10 @@
 using System;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace UmbracoTestData.Models
 {
+    [Serializable]
     internal class DocumentType
     {
         public DocumentType(Guid key, string name)
@@ -17,21 +20,22 @@ namespace UmbracoTestData.Models
         public Guid[] CompositeContentTypes { get; set; } = Array.Empty<Guid>();
         public bool IsContainer { get; set; }
         public bool AllowAsRoot { get; set; }
-        public string[] AllowedTemplates { get; set; }
+        
+        public string[] AllowedTemplates { get; }
         public int[] AllowedContentTypes { get; set; } = Array.Empty<int>();
-        public string Alias { get; set; }
+        public string Alias { get; }
         public string Description { get; set; }
         public string Thumbnail { get; set; } = "folder.png";
-        public string Name { get; set; }
+        public string Name { get;  }
         public int Id { get; set; }
         public string Icon { get; set; } = "icon-document";
         public bool Trashed { get; set; }
-        public Guid Key { get; set; }
+        public Guid Key { get; }
         public int ParentId { get; set; } = -1;
         public string Path { get; set; }
         public bool AllowCultureVariant { get; set; }
         public bool IsElement { get; set; }
-        public string DefaultTemplate { get; set; }
+        public string DefaultTemplate { get; }
         public DocumentTypeGroup[] Groups { get; set; } = Array.Empty<DocumentTypeGroup>();
     }
 

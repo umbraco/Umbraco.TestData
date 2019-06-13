@@ -40,8 +40,7 @@ namespace UmbracoTestData
             _logger = logger;
             _maxItemsPrLevel = maxItemsPrLevel;
             _chunkSize = chunkSize;
-            _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(5);
+            _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
         }
 
         public async Task Start()
@@ -123,11 +122,6 @@ namespace UmbracoTestData
             {
                 var current = levels.Where(x => x.Value.Count == i).ToArray();
 
-                if (!current.Any())
-                {
-                    break;
-                }
-
                 _logger.Information("Create level {level} of content. Total of {numberInLevel}", i, current.Length);
 
 
@@ -140,7 +134,7 @@ namespace UmbracoTestData
                     foreach (var (key, _) in chunk)
                     {
                         var position = GetPositionInTree((uint) key, numberOfItemsOnEachLevel);
-                        var name = $"Item {string.Join(".", position)}";
+                        var name = $"Item {ToPositionString(position)}";
                         var parentPosition = GetParentPositionAsString((uint) key, numberOfItemsOnEachLevel);
 
                         
@@ -155,7 +149,7 @@ namespace UmbracoTestData
                     foreach (var (key, value) in tasks)
                     {
                         var position = GetPositionInTree((uint) key, numberOfItemsOnEachLevel);
-                        parentIds[String.Join(".", position)] = value.Result.Id;
+                        parentIds[ToPositionString(position)] = value.Result.Id;
                     }
 
                     _logger.Information("Created {createdNumber}/{numberInLevel}",
@@ -163,6 +157,8 @@ namespace UmbracoTestData
                 }
             }
         }
+
+        private static string ToPositionString(IEnumerable<uint> position) => string.Join(".", position);
 
         private static IDictionary<int, IList<uint>> BuildLevels(uint countOfContentNodes, uint numberOfItemsOnEachLevel)
         {
@@ -180,22 +176,17 @@ namespace UmbracoTestData
         {
             var position = GetPositionInTree( currentItemNumber, numberOfItemsOnEachLevel);
 
-            return string.Join(".", position.Take(position.Count - 1));
+            return ToPositionString(position.Take(position.Count - 1));
         }
 
         internal static IList<uint> GetPositionInTree(uint currentItemNumber, uint numberOfItemsOnEachLevel)
         {
             var runner = currentItemNumber;
-
-            if (currentItemNumber == 0)
-            {
-                return new List<uint>(){ 0 };
-            }
             
             var remainders = new List<uint>();
             while (runner != 0)
             {
-                var remainder = (runner % numberOfItemsOnEachLevel);
+                var remainder = runner % numberOfItemsOnEachLevel;
 
                 if (remainder == 0)
                 {
